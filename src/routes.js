@@ -5,6 +5,14 @@ const db = require('../database');
 const router = express.Router();
 
 // Register User
+router.get('/login', (req, res) => {
+  res.sendFile(path.join(__dirname, '../views/login.html'));  // Adjust path to HTML
+});
+
+router.get('/register', (req, res) => {
+  res.sendFile(path.join(__dirname, '../views/register.html'));  // Adjust path to HTML
+});
+
 router.post('/register', async (req, res) => {
   const { username, password } = req.body;
 

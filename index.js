@@ -1,6 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const routes = require('./src/routes');  // Adjust as needed
+const routes = require('./src/routes');  // Routes for login and register
+const path = require('path');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -9,16 +10,17 @@ const PORT = process.env.PORT || 3000;
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
-// Routes
-app.use('/', routes);
+// Serve static files (login and register pages)
+app.use(express.static(path.join(__dirname, 'views')));
 
-// Serve the root page (optional)
+// Routes for login and register (you might need to define these routes correctly)
+app.use('/login', routes);
+app.use('/register', routes);
+
+// Serve root page (optional)
 app.get('/', (req, res) => {
   res.send('<h1>Welcome to the Login System</h1><p>Go to /login to login or /register to register.</p>');
 });
-
-// Serve static files (HTML pages)
-app.use(express.static('views'));
 
 // Start the server
 app.listen(PORT, () => {

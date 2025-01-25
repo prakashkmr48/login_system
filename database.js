@@ -1,15 +1,22 @@
 const sqlite3 = require('sqlite3').verbose();
 const dbPath = '/tmp/users.db'; // Use the /tmp directory
 
-// Set the path to the database file
-const dbPath = path.join(__dirname, 'users.db');
+const fs = require('fs');
+const dbPath = '/tmp/users.db';
 
-// Initialize SQLite database
+// Ensure the /tmp directory exists
+if (!fs.existsSync('/tmp')) {
+  fs.mkdirSync('/tmp');
+}
+
 const db = new sqlite3.Database(dbPath, (err) => {
   if (err) {
-    console.error('Error opening database:', err.message);
+    console.error('Error opening database:', err);
   } else {
-    console.log('Connected to the SQLite database.');
+    console.log('Database connected successfully');
+  }
+});
+
 
     // Create the users table if it doesn't exist
     db.run(

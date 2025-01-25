@@ -1,67 +1,74 @@
 const express = require('express');
-const bcrypt = require('bcrypt');
-const db = require('../database');
+const sqlite3 = require('sqlite3').verbose();
+const bcrypt = require('bcrypt');  // For hashing passwords
 const path = require('path');
 
-const router = express.Router();
+const app = express();
+const dbPath = path.join(__dirname, 'users.db');
+const db = new sqlite3.Database(dbPath);
 
-// Serve login page
-router.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, '../views/login.html'));  // Serve login.html
+// Middleware to parse form data
+app.use(express.urlencoded({ extended: true }));
+
+// Serve the registration page
+app.get('/register', (req, res) => {
+  res.sendFile(path.join(__dirname, 'register.html'));
 });
 
-// Registration route
-router.get('/register', (req, res) => {
-  res.sendFile(path.join(__dirname, '../views/register.html'));  // Serve register.html
-});
-
-// Register User
-router.post('/register', async (req, res) => {
+// Handle registration form submission
+app.post('/register', (req, res) => {
   const { username, password } = req.body;
 
-  if (!username || !password) {
-    return res.status(400).send('Username and password are required.');
-  }
+  // Hash the password before storing it
+  bcrypt.hash(password, 10, (err, hashedPassword) => {
+    if (err) {
+      console.error('Error hashing password:', err);
+      return res.status(500).send('Server error');
+    }
 
-  const hashedPassword = await bcrypt.hash(password, 10);
-
-  db.run(
-    `INSERT INTO users (username, password) VALUES (?, ?)`,
-    [username, hashedPassword],
-    (err) => {
+    // Insert the new user into the database
+    const query = 'INSERT INTO users (username, password) VALUES (?, ?)';
+    db.run(query, [username, hashedPassword], (err) => {
       if (err) {
-        return res.status(400).send('Username already exists.');
+        console.error('Error inserting data:', err);
+        return res.status(500).send('Registration failed');
       }
-      res.send('Registration successful!');
-    }
-  );
+
+      res.redirect('/login');
+    });
+  });
 });
 
-// Login User
-router.post('/login', (req, res) => {
+// Serve the login page
+app.get('/login', (req, res) => {
+  res.sendFile(path.join(__dirname, 'login.html'));
+});
+
+// Handle login form submission
+app.post('/login', (req, res) => {
   const { username, password } = req.body;
 
-  if (!username || !password) {
-    return res.status(400).send('Username and password are required.');
-  }
-
-  db.get(
-    `SELECT * FROM users WHERE username = ?`,
-    [username],
-    async (err, user) => {
-      if (err || !user) {
-        return res.status(400).send('Invalid username or password.');
-      }
-
-      const isPasswordCorrect = await bcrypt.compare(password, user.password);
-
-      if (isPasswordCorrect) {
-        res.send('Login successful!');
-      } else {
-        res.status(400).send('Invalid username or password.');
-      }
+  // Fetch the user from the database
+  const query = 'SELECT * FROM users WHERE username = ?';
+  db.get(query, [username], (err, row) => {
+    if (err || !row) {
+      console.log('Login failed: user not found');
+      return res.status(401).send('Login failed');
     }
-  );
+
+    // Compare the password with the stored hashed password
+    bcrypt.compare(password, row.password, (err, result) => {
+      if (result) {
+        res.send('Login successful');
+      } else {
+        res.status(401).send('Login failed: Invalid credentials');
+      }
+    });
+  });
 });
 
-module.exports = router;
+// Start the server
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Server is running on http://localhost:${PORT}`);
+});

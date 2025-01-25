@@ -1,23 +1,22 @@
 const express = require('express');
-const bodyParser = require('body-parser');
-const routes = require('./src/routes');  // Routes for login and register
+const routes = require('./src/routes');
 const path = require('path');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Middleware
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
+// Middleware to parse form data and JSON
+app.use(express.urlencoded({ extended: true }));  // To parse application/x-www-form-urlencoded
+app.use(express.json());  // To parse application/json
 
 // Serve static files (login and register pages)
 app.use(express.static(path.join(__dirname, 'views')));
 
-// Routes for login and register (you might need to define these routes correctly)
+// Use routes
 app.use('/login', routes);
 app.use('/register', routes);
 
-// Serve root page (optional)
+// Root page
 app.get('/', (req, res) => {
   res.send('<h1>Welcome to the Login System</h1><p>Go to /login to login or /register to register.</p>');
 });

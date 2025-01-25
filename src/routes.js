@@ -1,18 +1,21 @@
 const express = require('express');
 const bcrypt = require('bcrypt');
 const db = require('../database');
+const path = require('path');
 
 const router = express.Router();
 
-// Register User
-router.get('/login', (req, res) => {
-  res.sendFile(path.join(__dirname, '../views/login.html'));  // Adjust path to HTML
+// Serve login page
+router.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, '../views/login.html'));  // Serve login.html
 });
 
+// Registration route
 router.get('/register', (req, res) => {
-  res.sendFile(path.join(__dirname, '../views/register.html'));  // Adjust path to HTML
+  res.sendFile(path.join(__dirname, '../views/register.html'));  // Serve register.html
 });
 
+// Register User
 router.post('/register', async (req, res) => {
   const { username, password } = req.body;
 

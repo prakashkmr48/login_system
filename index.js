@@ -12,7 +12,7 @@ app.use(express.urlencoded({ extended: true }));  // This is the correct middlew
 
 // Serve the registration page
 app.get('/register', (req, res) => {
-  res.sendFile(path.join(__dirname, 'register.html'));
+  res.sendFile(path.join(__dirname, 'views', 'register.html'));
 });
 
 // Handle registration form submission
@@ -38,7 +38,7 @@ app.post('/register', (req, res) => {
 
 // Serve the login page
 app.get('/login', (req, res) => {
-  res.sendFile(path.join(__dirname, 'login.html'));
+  res.sendFile(path.join(__dirname, 'views', 'login.html'));
 });
 
 // Handle login form submission

@@ -1,5 +1,5 @@
 const sqlite3 = require('sqlite3').verbose();
-const path = require('path');
+const dbPath = '/tmp/users.db'; // Use the /tmp directory
 
 // Set the path to the database file
 const dbPath = path.join(__dirname, 'users.db');

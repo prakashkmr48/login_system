@@ -17,6 +17,9 @@ app.get('/', (req, res) => {
   res.send('<h1>Welcome to the Login System</h1><p>Go to /login to login or /register to register.</p>');
 });
 
+// Serve static files (HTML pages)
+app.use(express.static('views'));
+
 // Start the server
 app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);

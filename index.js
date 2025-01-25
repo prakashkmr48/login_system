@@ -4,8 +4,15 @@ const bcrypt = require('bcrypt');  // For hashing passwords
 const path = require('path');
 
 const app = express();
-const dbPath = path.join(__dirname, 'users.db');
-const db = new sqlite3.Database(dbPath);
+// Use a relative path to the database or store it in the /tmp directory
+const dbPath = path.join(__dirname, 'tmp', 'users.db');
+const db = new sqlite3.Database(dbPath, (err) => {
+  if (err) {
+    console.error('Error opening database:', err);
+  } else {
+    console.log('Database connected successfully');
+  }
+});
 
 // Middleware to parse form data
 app.use(express.urlencoded({ extended: true }));  // This is the correct middleware for parsing POST data

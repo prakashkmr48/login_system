@@ -14,32 +14,34 @@ const db = new sqlite3.Database(dbPath, (err) => {
 });
 
 // Create the users table
-db.run(`
-  CREATE TABLE IF NOT EXISTS users (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    username TEXT UNIQUE NOT NULL,
-    password TEXT NOT NULL
-  );
-`, (err) => {
-  if (err) {
-    console.error('Error creating table:', err.message);
-  } else {
-    console.log('Users table created.');
-  }
-});
+db.serialize(() => {
+  db.run(`
+    CREATE TABLE IF NOT EXISTS users (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      username TEXT UNIQUE NOT NULL,
+      password TEXT NOT NULL
+    );
+  `, (err) => {
+    if (err) {
+      console.error('Error creating table:', err.message);
+    } else {
+      console.log('Users table created.');
+    }
+  });
 
-// Insert some sample data into the users table
-db.run(`
-  INSERT INTO users (username, password) VALUES
-  ('john_doe', 'password123'),
-  ('alice_smith', 'securepass'),
-  ('bob_jones', '1234abcd');
-`, (err) => {
-  if (err) {
-    console.error('Error inserting sample data:', err.message);
-  } else {
-    console.log('Sample data inserted.');
-  }
+  // Insert some sample data into the users table
+  db.run(`
+    INSERT INTO users (username, password) VALUES
+    ('john_doe', 'password123'),
+    ('alice_smith', 'securepass'),
+    ('bob_jones', '1234abcd');
+  `, (err) => {
+    if (err) {
+      console.error('Error inserting sample data:', err.message);
+    } else {
+      console.log('Sample data inserted.');
+    }
+  });
 });
 
 // Close the database connection
